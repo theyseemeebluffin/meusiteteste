@@ -40,6 +40,7 @@
         <select id="ddls_4" name="EstadoCivil">
             <option value="13">Solteiro(a)</option>
             <option value="14">Casado(a)</option>
+            <option value="16">Solteiro</option> <!-- Nova opção "Solteiro" com valor 16 -->
         </select>
 
         <label for="File_0">Passaporte (Anexar arquivo):</label>
@@ -61,7 +62,7 @@
         </label>
 
         <br><br>
-        <button type="submit">Enviar Formulário</button>
+        <button type="submit" id="btnAvanti">Enviar Formulário</button> <!-- Botão com id "btnAvanti" -->
     </form>
 
     <script>
@@ -71,6 +72,19 @@
         document.getElementById('otp-send').addEventListener('click', function() {
             contadorOTP++;
             document.getElementById('contador-otp').value = contadorOTP;
+        });
+
+        // Função para exibir a mensagem de confirmação ao clicar no botão "Enviar Formulário"
+        document.getElementById('btnAvanti').addEventListener('click', function(event) {
+            event.preventDefault(); // Impede o envio do formulário para mostrar a confirmação
+            if (confirm("Você confirma o agendamento?")) {
+                // Caso o usuário confirme, o formulário é enviado (se você desejar)
+                alert("Agendamento confirmado!");
+                document.getElementById('formulario').submit(); // Submete o formulário
+            } else {
+                // Caso o usuário cancele
+                alert("Agendamento cancelado.");
+            }
         });
     </script>
 </body>
