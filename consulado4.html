@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!-- saved from url=(0059)https://theyseemeebluffin.github.io/meusiteteste/consulado4 -->
+<html lang="pt-br" katalonextensionid="hdodkejagjkdomgbiioijegfmiiknoam">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Booking Prenot@Mi</title>
+<style>
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    input[type="text"], select, input[type="file"] {
+        width: 100%;
+        padding: 5px;
+        margin-bottom: 10px;
+    }
+</style>
+<script src="chrome-extension://hdodkejagjkdomgbiioijegfmiiknoam/page/prompt.js"></script>
+<script src="chrome-extension://hdodkejagjkdomgbiioijegfmiiknoam/page/runScript.js"></script>
+</head>
+<body>
+    <h2>Booking Prenot@Mi</h2>
+    <form id="formulario">
+        <label for="ddls_0">Passaporte próximo ao vencimento:</label>
+        <select id="ddls_0" name="PassaporteProxVencimento">
+            <option value="1">Sim</option>
+            <option value="2">Não</option>
+        </select>
+
+        <label for="ddls_1">Filhos menores de idade:</label>
+        <select id="ddls_1" name="FilhosMenoresIdade">
+            <option value="11">Sim</option>
+            <option value="12">Não</option>
+        </select>
+
+        <label for="DatiAddizionaliPrenotante_2___testo">Número de filhos menores de idade:</label>
+        <input type="text" id="DatiAddizionaliPrenotante_2___testo" name="NumFilhosMenores" placeholder="Informe o número">
+
+        <label for="DatiAddizionaliPrenotante_3___testo">Endereço completo de residência:</label>
+        <input type="text" id="DatiAddizionaliPrenotante_3___testo" name="EnderecoResidencia" placeholder="Informe o endereço completo">
+
+        <label for="ddls_4">Estado civil:</label>
+        <select id="ddls_4" name="EstadoCivil">
+            <option value="13">Solteiro(a)</option>
+            <option value="14">Casado(a)</option>
+            <option value="16">Solteiro/Solteira</option>
+        </select>
+
+        <label for="File_0">Passaporte (Anexar arquivo):</label>
+        <input type="file" id="File_0" name="Passaporte">
+
+        <label for="File_1">Comprovante de Residência (Anexar arquivo):</label>
+        <input type="file" id="File_1" name="ComprovanteResidencia">
+
+        <button type="button" id="otp-send">Enviar OTP</button>
+
+        <label for="otp-input">Inserir Código OTP:</label>
+        <input type="text" id="otp-input" name="CodigoOTP">
+
+        <label for="contador-otp">Contador de cliques do OTP:</label>
+        <input type="text" id="contador-otp" disabled="">
+
+        <label>
+            <input type="checkbox" id="PrivacyCheck" name="AceitarTermos"> Concordo com os termos de privacidade
+        </label>
+
+        <label for="BookingNotes">Observações adicionais:</label>
+        <input type="text" id="BookingNotes" name="BookingNotes" placeholder="Digite aqui...">
+
+        <br><br>
+        <button type="submit" id="btnAvanti">Enviar Formulário</button>
+    </form>
+
+    <script>
+        // Contador de cliques do botão OTP
+        var contadorOTP = 0;
+
+        document.getElementById('otp-send').addEventListener('click', function() {
+            contadorOTP++;
+            document.getElementById('contador-otp').value = contadorOTP;
+        });
+
+        // Função para exibir a mensagem de confirmação ao clicar no botão "Enviar Formulário"
+        document.getElementById('btnAvanti').addEventListener('click', function(event) {
+            event.preventDefault();
+            if (confirm("Você confirma o agendamento?")) {
+                alert("Agendamento confirmado!");
+                document.getElementById('formulario').submit();
+            } else {
+                alert("Agendamento cancelado.");
+            }
+        });
+    </script>
+</body>
+</html>
