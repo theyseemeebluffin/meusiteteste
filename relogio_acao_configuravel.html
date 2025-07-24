@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Relógio com Ação Personalizada</title>
+  <style>
+    #relogio {
+      font-size: 2em;
+      font-family: monospace;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      font-size: 1em;
+    }
+    label, input {
+      font-size: 1em;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Relógio com Navegação Automática Personalizada</h1>
+
+  <div id="relogio">00:00:00.000</div>
+
+  <div>
+    <label for="hora">Hora:</label>
+    <input type="number" id="hora" min="0" max="23" value="18">
+    <label for="minuto">Minuto:</label>
+    <input type="number" id="minuto" min="0" max="59" value="23">
+    <label for="segundo">Segundo:</label>
+    <input type="number" id="segundo" min="0" max="59" value="0">
+    <label for="ms">Milissegundo:</label>
+    <input type="number" id="ms" min="0" max="999" value="500">
+    <button onclick="definirHorario()">Definir horário alvo</button>
+  </div>
+
+  <br>
+
+  <button id="link_1" onclick="window.location.href='https://prenotami.esteri.it/Services/Booking/671'">
+    LINK 1
+  </button>
+  <button id="link_2" onclick="window.location.href='https://prenotami.esteri.it/Services/Booking/4705'">
+    LINK 2
+  </button>
+
+  <script>
+    let alvo = {{h: 18, m: 23, s: 0, ms: 500}};
+    let acionado = false;
+
+    function definirHorario() {
+      alvo.h = parseInt(document.getElementById('hora').value);
+      alvo.m = parseInt(document.getElementById('minuto').value);
+      alvo.s = parseInt(document.getElementById('segundo').value);
+      alvo.ms = parseInt(document.getElementById('ms').value);
+      acionado = false;
+      alert(`Horário alvo definido para ${alvo.h.toString().padStart(2,'0')}:${alvo.m.toString().padStart(2,'0')}:${alvo.s.toString().padStart(2,'0')}.${alvo.ms}`);
+    }
+
+    function atualizaRelogio() {
+      const agora = new Date();
+      const hh = String(agora.getHours()).padStart(2, '0');
+      const mm = String(agora.getMinutes()).padStart(2, '0');
+      const ss = String(agora.getSeconds()).padStart(2, '0');
+      const ms = String(agora.getMilliseconds()).padStart(3, '0');
+      document.getElementById('relogio').textContent = `${hh}:${mm}:${ss}.${ms}`;
+
+      if (!acionado &&
+          agora.getHours() === alvo.h &&
+          agora.getMinutes() === alvo.m &&
+          agora.getSeconds() === alvo.s &&
+          Math.abs(agora.getMilliseconds() - alvo.ms) < 15
+      ) {
+        acionado = true;
+        console.log("Hora atingida. Clicando no botão...");
+        document.getElementById('link_1').click();
+      }
+
+      requestAnimationFrame(atualizaRelogio);
+    }
+
+    atualizaRelogio();
+  </script>
+</body>
+</html>
