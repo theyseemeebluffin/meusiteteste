@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendário de Agendamento</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .calendar {
+      display: inline-block;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .calendar td, .calendar th {
+      border: 1px solid #ccc;
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    .calendar .available {
+      background-color: #d4edda; /* verde */
+      color: #155724;
+    }
+    .calendar .unavailable {
+      background-color: #f8d7da; /* vermelho */
+      color: #721c24;
+      cursor: not-allowed;
+    }
+    .calendar .selected {
+      background-color: #007bff;
+      color: white;
+    }
+    #idHiddenFasciaServizio {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .fascia {
+      display: none;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    .fascia.act {
+      display: block;
+      background-color: #cce5ff;
+      color: #004085;
+    }
+  </style>
+</head>
+<body>
+  <h2>Agendamento serviço: Passaporte</h2>
+  <p>Selecionar uma data e um horário disponível</p>
+
+  <table class="calendar">
+    <tr>
+      <th>lu</th><th>ma</th><th>me</th><th>gi</th><th>ve</th><th>sa</th><th>do</th>
+    </tr>
+    <tr>
+      <td></td><td></td><td class="unavailable">01</td><td class="available" data-date="2025-07-02">02</td>
+      <td class="unavailable">03</td><td class="unavailable">04</td><td class="unavailable">05</td>
+    </tr>
+    <tr>
+      <td class="available" data-date="2025-07-07">07</td>
+      <td class="unavailable">08</td><td class="unavailable">09</td>
+      <td class="unavailable">10</td><td class="unavailable">11</td><td class="unavailable">12</td><td class="unavailable">13</td>
+    </tr>
+  </table>
+
+  <div class="fascia" id="slotInfo">
+    <div>
+      <div class="dot" style="color: green;"></div>
+      <span>08:30 - 12:30</span><br>
+      <span>(2)</span>
+      <input type="hidden" id="idHiddenFasciaServizio" value="">
+    </div>
+  </div>
+
+  <div class="footing-container">
+    <button type="submit" class="button primary" id="btnPrenotaNoOtp">Reservar</button>
+  </div>
+
+  <script>
+    const days = document.querySelectorAll(".calendar td.available");
+    const hiddenInput = document.getElementById("idHiddenFasciaServizio");
+    const slotInfo = document.getElementById("slotInfo");
+
+    days.forEach(day => {
+      day.addEventListener("click", () => {
+        document.querySelectorAll(".calendar td").forEach(d => d.classList.remove("selected"));
+        day.classList.add("selected");
+
+        const selectedDate = day.getAttribute("data-date");
+        hiddenInput.value = selectedDate === "2025-07-02" ? "17906873" : "17906879";
+        slotInfo.classList.add("act");
+      });
+    });
+  </script>
+</body>
+</html>
