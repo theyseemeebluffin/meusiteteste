@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relógio Automático - LINK 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #clock {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 60px;
+            margin: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relógio com Navegação Automática Personalizada</h1>
+    <div id="clock">00:00:00.000</div>
+
+    <div>
+        Hora: <input type="number" id="targetHour" min="0" max="23" value="18">
+        Minuto: <input type="number" id="targetMinute" min="0" max="59" value="27">
+        Segundo: <input type="number" id="targetSecond" min="0" max="59" value="0">
+        Milissegundo: <input type="number" id="targetMillisecond" min="0" max="999" value="500">
+        <button onclick="setTargetTime()">Definir horário alvo</button>
+    </div>
+
+    <br>
+    <button id="link_1" onclick="window.location.href='https://prenotami.esteri.it/Services/Booking/671'">LINK 1</button>
+
+    <script>
+        let targetTime = null;
+
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+
+            if (targetTime && now >= targetTime) {
+                window.location.href = 'https://prenotami.esteri.it/Services/Booking/671';
+                targetTime = null;
+            }
+        }
+
+        function setTargetTime() {
+            const hour = parseInt(document.getElementById('targetHour').value);
+            const minute = parseInt(document.getElementById('targetMinute').value);
+            const second = parseInt(document.getElementById('targetSecond').value);
+            const millisecond = parseInt(document.getElementById('targetMillisecond').value);
+
+            targetTime = new Date();
+            targetTime.setHours(hour, minute, second, millisecond);
+        }
+
+        window.onload = () => {
+            setInterval(updateClock, 10);
+        };
+    </script>
+</body>
+</html>
