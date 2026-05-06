@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Tracker Pro</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+background:#050505;
+color:white;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+padding:20px 16px 100px;
+}
+
+.container{
+max-width:430px;
+margin:0 auto;
+}
+
+.title{
+font-size:48px;
+font-weight:900;
+line-height:0.95;
+margin-bottom:24px;
+}
+
+.title span{
+color:#b6ff4d;
+}
+
+.days{
+display:flex;
+gap:10px;
+overflow-x:auto;
+margin-bottom:24px;
+}
+
+.days button{
+border:none;
+background:#1f1f22;
+color:white;
+padding:14px 18px;
+border-radius:18px;
+font-weight:800;
+font-size:15px;
+white-space:nowrap;
+}
+
+.days button.active{
+background:#b6ff4d;
+color:black;
+}
+
+.exercise-card{
+background:linear-gradient(180deg,#181818,#111111);
+border-radius:28px;
+padding:18px;
+margin-bottom:18px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.exercise-header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+margin-bottom:14px;
+gap:12px;
+}
+
+.exercise-name{
+font-size:24px;
+font-weight:900;
+margin-bottom:6px;
+}
+
+.exercise-meta{
+color:#58a6ff;
+font-size:14px;
+}
+
+.right-tools{
+display:flex;
+flex-direction:column;
+gap:8px;
+align-items:flex-end;
+}
+
+.history-btn{
+border:none;
+background:#26262a;
+color:#b6ff4d;
+padding:10px 14px;
+border-radius:14px;
+font-weight:700;
+font-size:13px;
+}
+
+.timer{
+background:rgba(182,255,77,0.08);
+border:1px solid rgba(182,255,77,0.15);
+color:#b6ff4d;
+padding:10px 14px;
+border-radius:14px;
+font-size:22px;
+font-weight:900;
+min-width:92px;
+text-align:center;
+}
+
+.set-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+background:#232325;
+border-radius:22px;
+padding:14px 12px;
+margin-bottom:10px;
+gap:8px;
+}
+
+.set-number{
+width:42px;
+height:42px;
+border-radius:50%;
+background:#3a3a40;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+font-weight:900;
+flex-shrink:0;
+}
+
+.metric{
+display:flex;
+align-items:center;
+gap:4px;
+}
+
+.metric input{
+width:45px;
+background:transparent;
+border:none;
+color:white;
+font-size:24px;
+font-weight:900;
+text-align:center;
+outline:none;
+}
+
+.metric span{
+font-size:13px;
+color:#777;
+}
+
+.multiply{
+color:#555;
+font-size:24px;
+}
+
+.check-btn{
+width:48px;
+height:48px;
+border:none;
+border-radius:50%;
+background:#4a4a52;
+color:white;
+font-size:24px;
+font-weight:900;
+flex-shrink:0;
+}
+
+.check-btn.active{
+background:#b6ff4d;
+color:black;
+box-shadow:0 0 20px rgba(182,255,77,0.4);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="title">
+Seu treino do dia<span>.</span>
+</div>
+
+<div class="days">
+<button class="active">DIA 1</button>
+<button>DIA 2</button>
+<button>DIA 3</button>
+<button>DIA 4</button>
+<button>DIA 5</button>
+</div>
+
+<div id="workout"></div>
+
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', ()=>{
+
+const workouts = {
+1:[
+{name:'SUPINO RETO HALTER',sets:5,reps:6,kg:0,rest:180},
+{name:'BARRA FIXA + DEAD HANG',sets:4,reps:6,kg:0,rest:180},
+{name:'FLEXORA',sets:4,reps:12,kg:0,rest:90},
+{name:'PANTURRILHA EM PÉ MAQUINA',sets:5,reps:10,kg:0,rest:90}
+],
+2:[
+{name:'LEVANTAMENTO TERRA',sets:3,reps:6,kg:0,rest:180},
+{name:'BARRA FIXA',sets:4,reps:6,kg:0,rest:180},
+{name:'LEV. LATERAL',sets:3,reps:10,kg:0,rest:90},
+{name:'ABDOMINAL MAQUINA',sets:4,reps:8,kg:0,rest:90}
+],
+3:[
+{name:'AGACHAMENTO',sets:4,reps:8,kg:0,rest:180},
+{name:'DESENV. MAQUINA',sets:3,reps:10,kg:0,rest:180},
+{name:'TRICEPS PARALELA',sets:5,reps:8,kg:0,rest:180},
+{name:'PANTURRILHA EM PÉ',sets:5,reps:10,kg:0,rest:90}
+],
+4:[
+{name:'SUPINO INCLINADO HALTER',sets:5,reps:8,kg:0,rest:180},
+{name:'ROSCA SCOTT INVERSA',sets:5,reps:10,kg:0,rest:90},
+{name:'AB. MAQUINA',sets:4,reps:10,kg:0,rest:90}
+],
+5:[
+{name:'FLEXORA',sets:4,reps:12,kg:0,rest:90},
+{name:'EXTENSORA',sets:4,reps:12,kg:0,rest:90},
+{name:'LEV LATERAL',sets:4,reps:15,kg:0,rest:90},
+{name:'VOADOR INVERTIDO',sets:4,reps:15,kg:0,rest:90}
+]
+};
+
+const workoutEl = document.getElementById('workout');
+
+function formatTime(seconds){
+const min = String(Math.floor(seconds/60)).padStart(2,'0');
+const sec = String(seconds%60).padStart(2,'0');
+return min + ':' + sec;
+}
+
+function renderDay(day){
+
+workoutEl.innerHTML='';
+
+workouts[day].forEach((exercise,index)=>{
+
+let setsHTML='';
+
+for(let i=1;i<=exercise.sets;i++){
+
+const saved = JSON.parse(
+localStorage.getItem(`${exercise.name}-set-${i}`) || '{}'
+);
+
+const savedKg = saved.kg || 0;
+const savedReps = saved.reps || exercise.reps;
+
+setsHTML += `
+<div class="set-row">
+
+<div class="set-number">${i}</div>
+
+<div class="metric">
+<input type="number" value="${savedKg}">
+<span>kg</span>
+</div>
+
+<div class="multiply">×</div>
+
+<div class="metric">
+<input type="number" value="${savedReps}">
+<span>reps</span>
+</div>
+
+<button class="check-btn" onclick="saveSet(this,'${exercise.name}',${i},'timer-${day}-${index}',${exercise.rest})">
+✓
+</button>
+
+</div>`;
+}
+
+workoutEl.innerHTML += `
+<div class="exercise-card">
+
+<div class="exercise-header">
+
+<div>
+<div class="exercise-name">${exercise.name}</div>
+<div class="exercise-meta">${exercise.sets}x${exercise.reps}</div>
+</div>
+
+<div class="right-tools">
+<button class="history-btn" onclick="showHistory('${exercise.name}')">
+Histórico
+</button>
+
+<div class="timer" id="timer-${day}-${index}">
+${formatTime(exercise.rest)}
+</div>
+</div>
+
+</div>
+
+${setsHTML}
+
+</div>`;
+});
+
+}
+
+window.saveSet = function(button,exerciseName,setNumber,timerId,rest){
+
+button.classList.toggle('active');
+
+const row = button.closest('.set-row');
+const inputs = row.querySelectorAll('input');
+
+const kg = inputs[0].value;
+const reps = inputs[1].value;
+
+const history = JSON.parse(
+localStorage.getItem(exerciseName) || '[]'
+);
+
+history.push({
+date:new Date().toLocaleDateString(),
+set:setNumber,
+kg,
+reps
+});
+
+localStorage.setItem(exerciseName,JSON.stringify(history));
+
+localStorage.setItem(
+`${exerciseName}-set-${setNumber}`,
+JSON.stringify({kg,reps})
+);
+
+startTimer(timerId,rest);
+}
+
+function startTimer(timerId,seconds){
+
+const timer=document.getElementById(timerId);
+
+if(timer.interval){
+clearInterval(timer.interval);
+}
+
+let remaining=seconds;
+
+timer.textContent=formatTime(remaining);
+
+remaining--;
+
+timer.interval=setInterval(()=>{
+
+if(remaining < 0){
+
+clearInterval(timer.interval);
+
+if(navigator.vibrate){
+navigator.vibrate([200,100,200]);
+}
+
+return;
+}
+
+timer.textContent=formatTime(remaining);
+
+remaining--;
+
+},1000);
+
+}
+
+window.showHistory = function(exerciseName){
+
+const history = JSON.parse(
+localStorage.getItem(exerciseName) || '[]'
+);
+
+if(history.length === 0){
+alert('Nenhum histórico salvo ainda.');
+return;
+}
+
+const recent = history.slice(-20).reverse();
+
+let text = `${exerciseName}\n\nÚltimas semanas:\n\n`;
+
+recent.forEach(item=>{
+text += `${item.date} • SET ${item.set}\n${item.kg}kg x ${item.reps}\n\n`;
+});
+
+alert(text);
+
+}
+
+document.querySelectorAll('.days button').forEach((btn,index)=>{
+
+btn.addEventListener('click',()=>{
+
+document.querySelectorAll('.days button')
+.forEach(b=>b.classList.remove('active'));
+
+btn.classList.add('active');
+
+renderDay(index+1);
+
+});
+
+});
+
+renderDay(1);
+
+});
+</script>
+
+</body>
+</html>
