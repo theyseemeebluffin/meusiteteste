@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Workout Tracker</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+background:#050505;
+color:white;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+padding:20px 16px 80px;
+}
+
+body::before{
+content:'';
+position:fixed;
+top:-120px;
+left:50%;
+transform:translateX(-50%);
+width:300px;
+height:300px;
+background:rgba(157,255,0,0.12);
+filter:blur(80px);
+pointer-events:none;
+}
+
+.container{
+max-width:430px;
+margin:0 auto;
+}
+
+.subtitle{
+color:#666;
+font-size:14px;
+margin-bottom:6px;
+}
+
+.title{
+font-size:52px;
+line-height:0.95;
+font-weight:900;
+margin-bottom:24px;
+}
+
+.title span{color:#b6ff4d}
+
+.days{
+display:flex;
+gap:10px;
+overflow:auto;
+margin-bottom:24px;
+padding-bottom:4px;
+}
+
+.days button{
+border:none;
+background:#1b1b1d;
+color:white;
+padding:14px 18px;
+border-radius:18px;
+font-weight:800;
+font-size:13px;
+white-space:nowrap;
+}
+
+.days .active{
+background:#b6ff4d;
+color:black;
+}
+
+.exercise-card{
+background:linear-gradient(180deg,#171717,#101010);
+border:1px solid rgba(255,255,255,0.05);
+border-radius:28px;
+padding:18px;
+margin-bottom:18px;
+box-shadow:0 10px 40px rgba(0,0,0,0.45);
+}
+
+.exercise-header{
+display:grid;
+grid-template-columns:minmax(0,1fr) auto;
+gap:12px;
+align-items:start;
+margin-bottom:18px;
+}
+
+.exercise-name-input{
+font-family:inherit;
+background:transparent;
+border:none;
+outline:none;
+color:white;
+font-size:28px;
+font-weight:900;
+line-height:1;
+margin-bottom:8px;
+min-width:72px;
+}
+
+
+.exercise-note-inline{
+color:white;
+font-size:14px;
+font-weight:500;
+margin-left:10px;
+opacity:0.9;
+display:inline;
+}
+
+.exercise-meta{
+color:#b6ff4d;
+font-size:28px;
+font-weight:600;
+}
+
+.tool-buttons{
+display:flex;
+gap:8px;
+align-items:center;
+justify-content:flex-end;
+margin-bottom:8px;
+}
+
+.note-btn,.history-btn{
+border:none;
+background:#232325;
+color:#b6ff4d;
+padding:10px 14px;
+border-radius:14px;
+font-size:13px;
+font-weight:700;
+}
+
+.timer{
+background:rgba(157,255,0,0.08);
+border:1px solid rgba(157,255,0,0.15);
+color:#b6ff4d;
+border-radius:18px;
+padding:10px 14px;
+font-weight:900;
+font-size:16px;
+}
+
+.set-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+background:#232325;
+border-radius:22px;
+padding:14px 12px;
+margin-bottom:10px;
+transition:all 0.2s ease;
+}
+
+.set-row.completed{
+background:rgba(182,255,77,0.12);
+box-shadow:0 0 20px rgba(182,255,77,0.12);
+border:1px solid rgba(182,255,77,0.18);
+}
+
+.set-number{
+width:42px;
+height:42px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:900;
+font-size:20px;
+background:#3a3a40;
+color:white;
+}
+
+.metric{
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.metric input{
+width:45px;
+background:transparent;
+border:none;
+color:white;
+font-size:30px;
+font-weight:900;
+text-align:center;
+outline:none;
+}
+
+.metric span{
+color:#777;
+font-size:14px;
+}
+
+.multiply{
+color:#555;
+font-size:24px;
+}
+
+.check-btn{
+width:48px;
+height:48px;
+border:none;
+border-radius:50%;
+background:#4a4a52;
+color:white;
+font-size:24px;
+font-weight:900;
+}
+
+.check-btn.active{
+background:#b6ff4d;
+color:black;
+box-shadow:0 0 24px rgba(182,255,77,0.45);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="subtitle">Treino</div>
+<div class="title">Seu treino do dia<span>.</span></div>
+
+<div class="days">
+<button class="active">DIA 1</button>
+<button>DIA 2</button>
+<button>DIA 3</button>
+<button>DIA 4</button>
+<button>DIA 5</button>
+</div>
+
+<div id="workout"></div>
+</div>
+
+<script>
+const workouts = {
+1:[
+{name:'SUPINO RETO HALTER',sets:5,reps:6,kg:0,rest:180},
+{name:'BARRA FIXA + DEAD HANG',sets:4,reps:6,kg:0,rest:180},
+{name:'FLEXORA',sets:4,reps:12,kg:0,rest:90},
+{name:'PANTURRILHA EM PÉ MAQUINA',sets:5,reps:10,kg:0,rest:90}
+],
+2:[
+{name:'LEVANTAMENTO TERRA',sets:3,reps:6,kg:0,rest:180},
+{name:'BARRA FIXA',sets:4,reps:6,kg:0,rest:180},
+{name:'LEV. LATERAL',sets:3,reps:10,kg:0,rest:90},
+{name:'ABDOMINAL MAQUINA',sets:4,reps:8,kg:0,rest:90}
+],
+3:[
+{name:'AGACHAMENTO',sets:4,reps:8,kg:0,rest:180},
+{name:'DESENV. MAQUINA',sets:3,reps:10,kg:0,rest:180},
+{name:'TRICEPS PARALELA',sets:5,reps:8,kg:0,rest:180},
+{name:'PANTURRILHA EM PÉ',sets:5,reps:10,kg:0,rest:90}
+],
+4:[
+{name:'SUPINO INCLINADO HALTER',sets:5,reps:8,kg:0,rest:180},
+{name:'ROSCA SCOTT INVERSA',sets:5,reps:10,kg:0,rest:90},
+{name:'AB. MAQUINA',sets:4,reps:10,kg:0,rest:90}
+],
+5:[
+{name:'FLEXORA',sets:4,reps:12,kg:0,rest:90},
+{name:'EXTENSORA',sets:4,reps:12,kg:0,rest:90},
+{name:'LEV LATERAL',sets:4,reps:15,kg:0,rest:90},
+{name:'VOADOR INVERTIDO',sets:4,reps:15,kg:0,rest:90}
+]
+};
+
+window.addEventListener('DOMContentLoaded',()=>{
+
+const workoutEl=document.getElementById('workout');
+
+function formatTime(seconds){
+const min=String(Math.floor(seconds/60)).padStart(2,'0');
+const sec=String(seconds%60).padStart(2,'0');
+return `${min}:${sec}`;
+}
+
+function renderDay(day){
+
+workoutEl.innerHTML='';
+
+workouts[day].forEach((exercise,index)=>{
+
+let sets='';
+
+for(let i=1;i<=exercise.sets;i++){
+
+sets += `
+<div class="set-row">
+
+<div class="set-number">${i}</div>
+
+<div class="metric">
+<input type="number" value="${exercise.kg}">
+<span>kg</span>
+</div>
+
+<div class="multiply">×</div>
+
+<div class="metric">
+<input type="number" value="${exercise.reps}">
+<span>reps</span>
+</div>
+
+<button class="check-btn" data-timer="timer-${day}-${index}" data-rest="${exercise.rest}">
+✓
+</button>
+
+</div>`;
+}
+
+workoutEl.innerHTML += `
+<div class="exercise-card">
+
+<div class="exercise-header">
+
+<div>
+<input class="exercise-name-input" value="${exercise.name}">
+<div class="exercise-meta">
+${exercise.sets}x${exercise.reps}
+<span class="exercise-note-inline">
+${localStorage.getItem(exercise.name + '-note') ? '* ' + localStorage.getItem(exercise.name + '-note') + ' *' : ''}
+</span>
+</div>
+</div>
+
+<div>
+<div class="tool-buttons">
+<button class="note-btn" onclick="editNote(\'${exercise.name}\')">📝</button>
+<button class="history-btn" onclick="showHistory('${exercise.name}')">📈</button>
+</div>
+
+<div class="timer" id="timer-${day}-${index}">
+${formatTime(exercise.rest)}
+</div>
+</div>
+
+</div>
+
+${sets}
+
+</div>`;
+});
+
+}
+
+
+function startTimer(timerId,seconds){
+
+const timer=document.getElementById(timerId);
+
+if(!timer) return;
+
+if(timer.interval){
+clearInterval(timer.interval);
+}
+
+let remaining=seconds;
+
+timer.textContent=formatTime(remaining);
+
+timer.interval=setInterval(()=>{
+
+remaining--;
+
+if(remaining < 0){
+clearInterval(timer.interval);
+
+timer.textContent='00:00';
+
+if(navigator.vibrate){
+navigator.vibrate([200,100,200]);
+}
+
+return;
+}
+
+timer.textContent=formatTime(remaining);
+
+},1000);
+
+}
+
+
+
+document.addEventListener('click',function(e){
+
+const button=e.target.closest('.check-btn');
+
+if(!button) return;
+
+button.classList.toggle('active');
+button.closest('.set-row').classList.toggle('completed');
+
+const row = button.closest('.set-row');
+const inputs = row.querySelectorAll('input');
+
+const kg = inputs[0].value;
+const reps = inputs[1].value;
+
+const exerciseCard = button.closest('.exercise-card');
+const exercise = exerciseCard.querySelector('.exercise-name-input').value;
+
+const setNumber = row.querySelector('.set-number').innerText;
+
+const today = new Date().toLocaleDateString();
+
+
+let history = JSON.parse(localStorage.getItem(exercise) || '[]');
+
+let existingDay = history.find(d => d.date === today);
+
+if(!existingDay){
+
+existingDay = {
+date: today,
+sets:[]
+};
+
+history.push(existingDay);
+
+}
+
+const existingSet = existingDay.sets.find(s => s.set === setNumber);
+
+if(existingSet){
+
+existingSet.kg = kg;
+existingSet.reps = reps;
+
+} else {
+
+existingDay.sets.push({
+set:setNumber,
+kg,
+reps
+});
+
+}
+
+existingDay.sets.sort((a,b)=>Number(a.set)-Number(b.set));
+
+localStorage.setItem(exercise, JSON.stringify(history));
+
+
+const timerId = button.getAttribute('data-timer');
+const restTime = parseInt(button.getAttribute('data-rest'));
+
+startTimer(timerId, restTime);
+
+});
+
+
+document.querySelectorAll('.days button').forEach((btn,index)=>{
+
+btn.addEventListener('click',()=>{
+
+document.querySelectorAll('.days button')
+.forEach(b=>b.classList.remove('active'));
+
+btn.classList.add('active');
+
+renderDay(index+1);
+
+});
+
+});
+
+
+
+
+window.showHistory = function(exerciseName){
+
+const history = JSON.parse(localStorage.getItem(exerciseName) || '[]');
+
+if(!history.length){
+alert('Nenhum histórico salvo ainda.');
+return;
+}
+
+let text = `${exerciseName}
+
+`;
+
+
+history.forEach(day => {
+
+text += `${day.date}
+`;
+
+(day.sets || []).forEach(set => {
+
+text += `${set.kg}kg x ${set.reps} reps
+`;
+
+});
+
+text += `
+`;
+
+});
+
+alert(text);
+
+
+}
+
+
+window.editNote = function(exerciseName){
+
+const current = localStorage.getItem(exerciseName + '-note') || '';
+
+const note = prompt('Nota do exercício:', current);
+
+if(note !== null){
+localStorage.setItem(exerciseName + '-note', note);
+alert('Nota salva.');
+}
+
+}
+
+
+renderDay(1);
+
+});
+</script>
+
+</body>
+</html>
